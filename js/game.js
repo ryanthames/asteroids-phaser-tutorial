@@ -32,6 +32,16 @@ var bulletProperties = {
   maxCount: 30
 };
 
+var asteroidProperties = {
+  startingAsteroids: 4,
+  maxAsteroids: 20,
+  incrementAsteroids: 2,
+
+  asteroidLarge: { minVelocity: 50, maxVelocity: 150, minAngularVelocity: 0, maxAngularVelocity: 200, score: 20, nextSize: graphicAssets.asteroidMedium.name },
+  asteroidMedium: { minVelocity: 50, maxVelocity: 200, minAngularVelocity: 0, maxAngularVelocity: 200, score: 50, nextSize: graphicAssets.asteroidSmall.name },
+  asteroidSmall: { minVelocity: 50, maxVelocity: 300, minAngularVelocity: 0, maxAngularVelocity: 200, score: 100 }
+};
+
 var gameState = function(game){
   this.shipSprite;
 
@@ -42,6 +52,9 @@ var gameState = function(game){
 
   this.bulletGroup;
   this.bulletInterval = 0;
+
+  this.asteroidGroup;
+  this.asteroidCount = asteroidProperties.startingAsteroids;
 };
 
 gameState.prototype = {
@@ -59,12 +72,14 @@ gameState.prototype = {
       this.initGraphics();
       this.initPhysics();
       this.initKeyboard();
+      this.resetAsteroids();
     },
 
     update: function () {
       this.checkPlayerInput();
       this.checkBoundaries(this.shipSprite);
       this.bulletGroup.forEachExists(this.checkBoundaries, this);
+      this.asteroidGroup.forEachExists(this.checkBoundaries, this);
     },
 
     initGraphics: function() {
@@ -73,6 +88,7 @@ gameState.prototype = {
       this.shipSprite.anchor.set(0.5,0.5);
 
       this.bulletGroup = game.add.group();
+      this.asteroidGroup = game.add.group();
     },
 
     initPhysics: function() {
@@ -88,6 +104,9 @@ gameState.prototype = {
       this.bulletGroup.setAll('anchor.x', 0.5);
       this.bulletGroup.setAll('anchor.y', 0.5);
       this.bulletGroup.setAll('lifespan', bulletProperties.lifespan);
+
+      this.asteroidGroup.enableBody = true;
+      this.asteroidGroup.physicsBodyType = Phaser.Physics.ARCADE;
     },
 
     initKeyboard: function() {
@@ -147,6 +166,35 @@ gameState.prototype = {
           game.physics.arcade.velocityFromRotation(this.shipSprite.rotation, bulletProperties.speed, bullet.body.velocity);
           this.bulletInterval = game.time.now + bulletProperties.interval;
         }
+      }
+    },
+
+    createAsteroid: function(x, y, size) {
+      var asteroid = this.asteroidGroup.create(x, y, size);
+      asteroid.anchor.set(0.5, 0.5);
+      asteroid.body.angularVelocity = game.rnd.integerInRange(asteroidProperties[size].minAngularVelocity, asteroidProperties[size].maxAngularVelocity);
+
+      var randomAngle = game.math.degToRad(game.rnd.angle());
+      var randomVelocity = game.rnd.integerInRange(asteroidProperties[size].minVelocity, asteroidProperties[size].maxVelocity);
+
+      game.physics.arcade.velocityFromRotation(randomAngle, randomVelocity, asteroid.body.velocity);
+    },
+
+    resetAsteroids: function() {
+      for(var i = 0; i < this.asteroidCount; i++) {
+        var side = Math.round(Math.random());
+        var x;
+        var y;
+
+        if(side) {
+          x = Math.round(Math.random()) * gameProperties.screenWidgth;
+          y = Math.random() * gameProperties.screenHeight;
+        } else {
+          y = Math.round(Math.random()) * gameProperties.screenHeight;
+          x = Math.random() * gameProperties.screenWidth;
+        }
+
+        this.createAsteroid(x, y, graphicAssets.asteroidLarge.name);
       }
     }
 };
