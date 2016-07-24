@@ -14,9 +14,9 @@ var graphicAssets = {
   ship:{URL:'assets/ship.png', name:'ship'},
   bullet:{URL:'assets/bullet.png', name:'bullet'},
 
-  asteroidLarge:{URL:'assets/asteroidLarge.png', name:'asteroidLarge'},
-  asteroidMedium:{URL:'assets/asteroidMedium.png', name:'asteroidMedium'},
-  asteroidSmall:{URL:'assets/asteroidSmall.png', name:'asteroidSmall'}
+  asteroidLarge:{URL:'assets/trump-large.png', name:'asteroidLarge'},
+  asteroidMedium:{URL:'assets/trump-medium.png', name:'asteroidMedium'},
+  asteroidSmall:{URL:'assets/trump-small.png', name:'asteroidSmall'}
 };
 
 var soundAssets = {
